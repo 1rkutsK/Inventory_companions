@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "inventory_companions",
+  "version": "${version}",
+  "name": "Inventory Companions",
+  "description": "Client-side inventory companion overlay for survival and creative inventory screens.",
+  "authors": [
+    "Irku_",
+    "f_gav"
+  ],
+  "license": "All-Rights-Reserved",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "ru.irku.inventorycompanions.InventoryCompanionsClient"
+    ],
+    "modmenu": [
+      "ru.irku.inventorycompanions.InventoryCompanionsModMenu"
+    ]
+  },
+  "mixins": [
+    "inventory_companions.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": ">=26.1 <26.3",
+    "java": ">=25"
+  },
+  "suggests": {
+    "modmenu": ">=18.0.0"
+  },
+  "icon": "assets/inventory_companions/icon.png"
+}

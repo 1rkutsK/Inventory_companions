@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "ru.irku.inventorycompanions.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "AbstractContainerScreenAccessor",
+    "InventoryScreenMixin",
+    "CreativeModeInventoryScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

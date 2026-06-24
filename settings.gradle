@@ -1,0 +1,16 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net/")
+        }
+        maven {
+            name = "Modmuss50"
+            url = uri("https://maven.modmuss50.me/")
+        }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Inventory_companions_26.1-26.2"
