@@ -1,0 +1,90 @@
+plugins {
+    id "net.fabricmc.fabric-loom" version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/releases/"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Mod Menu is optional and only needed to compile its config-screen entrypoint.
+    compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") {
+        transitive = false
+    }
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+// Gradle test workers on Windows can lose project classpath entries when the
+// project directory contains characters outside the active system encoding.
+// Stage only this project's compiled outputs in the system temp directory so
+// tests also work from folders with Cyrillic names.
+def isWindows = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")
+if (isWindows) {
+    def safeTestRoot = new File(System.getProperty("java.io.tmpdir"), "inventory-companions-gradle-tests")
+    def safeMainOutput = new File(safeTestRoot, "main")
+    def safeTestOutput = new File(safeTestRoot, "test")
+
+    def stageWindowsTestOutputs = tasks.register("stageWindowsTestOutputs", Sync) {
+        dependsOn tasks.named("testClasses")
+        into safeTestRoot
+
+        from(sourceSets.main.output) {
+            into "main"
+        }
+        from(sourceSets.test.output) {
+            into "test"
+        }
+    }
+
+    tasks.withType(Test).configureEach {
+        dependsOn stageWindowsTestOutputs
+        testClassesDirs = files(safeTestOutput)
+        classpath = files(safeTestOutput, safeMainOutput) + configurations.testRuntimeClasspath
+        workingDir safeTestRoot
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
